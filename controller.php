@@ -38,7 +38,7 @@ class Controller {
 		// generate a database connection, using the PDO connector
 		// @see http://net.tutsplus.com/tutorials/php/why-you-should-be-using-phps-pdo-for-database-access/
 		$this->db = new PDO(
-			Config::read('DB.type') . ':host=' . Config::read('DB.host') . ';dbname=' . Config::read('DB.database'),
+			'mysql:host=' . Config::read('DB.host') . ';dbname=' . Config::read('DB.database'),
 			Config::read('DB.username'),
 			Config::read('DB.password'),
 			$options
@@ -49,10 +49,10 @@ class Controller {
 	// name is converted to lowercase and is then used as the filename
 	// return : NEW model object, or false if not found
 	public function loadModel($modelName) {
-		//
-		$found = rowe(MODEL_DIR . strtolower($modelName) . '.php');
+		// return true or false if it loaded or not
+		return rowe(MODEL_DIR . strtolower($modelName) . '.php');
 		// return new model (and pass the database connection to the model)
-		return ($found ? new $modelName($this->db) : false);
+		//return ($found ? $modelName($this->db) : false);
 	}
 	
 	// basically just renders the template and view
@@ -83,5 +83,6 @@ class Controller {
 		//slog('JSON reply: ' . $result);
 		header('Content-Type: application/json');
 		echo $result;
+    die();
 	}
 }

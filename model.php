@@ -1,9 +1,6 @@
 <?php
 // base Model class
 class Model {
-  // settings
-  public $isValid = true;
-
 	// constructor
 	function __construct($db) {
     try {
@@ -14,8 +11,15 @@ class Model {
     }
   }
 
+  public function findAll() {
+    return array();
+  }
+  public function findById($id) {
+    return array();
+  }
+
   // saves new mentor to database
-  protected function insert($data, $tableName) {
+  public function insert($data, $tableName) {
     // build statement out of data key values.
     // make sure they are correct programmer minion
     $sql = "";
@@ -55,7 +59,7 @@ class Model {
   }
 
   //
-  protected function update($data, $tableName, $id) {
+  public function update($data, $tableName = null, $id = null) {
 
     // unset ID because we don't need to update it
     unset($data['id']);
@@ -101,7 +105,7 @@ class Model {
   }
 
   // validates an array of values based on an array of rules for those values
-  private function validateWithMessages($data, $messages) {
+  public function validateWithMessages($data, $messages) {
     // for every validation error message
     foreach($messages as $k => $v) {
       // if the field wasn't even set in the data array, and its required,
@@ -149,7 +153,7 @@ class Model {
   }
 
   //
-  protected function validateModel($data, $modelName, $messages) {
+  public function validateModel($data, $modelName, $messages) {
     // make sure this is actually set
     // if not return empty array
     if(isset($data[$modelName])) {

@@ -5,23 +5,22 @@
 
   // prefill form field if it exists
   // does not return a value. don't need to echo this
-  function pf($data, $field)
-  {
+  function pf($data, $field) {
     $value = '';
     if(isset($data[$field])) $value = $data[$field];
     return $value;
   }
 
-  // prefill form field if it exists
+  // "prefill form field select" form field if it exists
   // does not return a value. don't need to echo this
-  function pfe($data, $field)
-  {
-    echo pf($data, $field);
+  function pfs($data, $field, $compare) {
+    $value = '';
+    if(isset($data[$field]) && $data[$field] == $compare) $value = ' selected="selected"';
+    echo $value;
   }
 
   // returns true or false whether valid email address
-  function validEmail($email)
-  {
+  function validEmail($email) {
     if(!filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
       return true;
     } else {
@@ -34,7 +33,7 @@
    *****************************/
 
   // return a hidden field
-  function fid($data, $model, $field, $default = '') {
+  function fhidden($data, $model, $field, $default = '') {
     $fieldName = 'data[' . $model . '][' . $field . ']';
     $value = $default;
     if(isset($data[$model][$field])) {
@@ -48,12 +47,13 @@
   }
 
   // return a text field and label
-  function ftext($data, $title, $model, $field, $required = false, $type = 'text', $class = '') {
+  function ftext($data, $title, $model, $field, $required = false, $type = 'text', $class = '', $placeholder = null) {
     $fieldName = 'data[' . $model . '][' . $field . ']';
+    if($placeholder === null) $placeholder = $title;
     $content = '';
     $content .= '<div class="form-field-group">';
     $content .= '<label for="' . $field . '">' . $title . ($required ? ' <span class="required">*</span>' : '') . '</label>';
-    $content .= '<input id="' . $field . '" type="' . $type . '" name="' . $fieldName . '" value="' . (isset($data[$model][$field]) ? $data[$model][$field] : '') . '" placeholder="' . $title . '" ' . ($required ? 'required="required" ' : '') . ($class != '' ? 'class="' . $class . '" ' : '') . '/>';
+    $content .= '<input id="' . $field . '" type="' . $type . '" name="' . $fieldName . '" value="' . (isset($data[$model][$field]) ? $data[$model][$field] : '') . '" placeholder="' . $placeholder . '" ' . ($required ? 'required="required" ' : '') . ($class != '' ? 'class="' . $class . '" ' : '') . '/>';
     if(isset($data[$model]['_ValidationErrors'][$field])) {
       $content .= '<p class="form-field-error-message">' . $data[$model]['_ValidationErrors'][$field] . '</p>';
     }
@@ -76,12 +76,13 @@
   }
 
   // return a textarea and label
-  function ftextarea($data, $title, $model, $field, $required = false) {
+  function ftextarea($data, $title, $model, $field, $required = false, $class = '', $placeholder = null) {
     $fieldName = 'data[' . $model . '][' . $field . ']';
+    if($placeholder === null) $placeholder = $title;
     $content = '';
     $content .= '<div class="form-field-group">';
     $content .= '<label for="' . $field . '">' . $title . ($required ? ' <span class="required">*</span>' : '') . '</label>';
-    $content .= '<textarea rows="3" id="' . $field . '" name="' . $fieldName . '" placeholder="' . $title . '" ' . ($required ? 'required="required" ' : '') . '>';
+    $content .= '<textarea class="' . $class . '" rows="3" id="' . $field . '" name="' . $fieldName . '" placeholder="' . $placeholder . '" ' . ($required ? 'required="required" ' : '') . '>';
     $content .= (isset($data[$model][$field]) ? $data[$model][$field] : '');
     $content .= '</textarea>';
     if(isset($data[$model]['_ValidationErrors'][$field])) {
@@ -92,10 +93,9 @@
   }
 
   // return a select field and label
-  function fselect($data, $title, $model, $field, $options, $required = false, $class = '') {
+  function fselect($data, $title, $model, $field, $options, $required = false, $class = '', $placeholder = null) {
     $defaultSelected = '';
-    $placeholderText = 'Select ' . $title; // which one??
-    $placeholderText = 'Please select';
+    if($placeholder === null) $placeholder = 'Select ' . $title;
     $content = '';
     $content .= '<div class="form-field-group">';
     if(isset($data[$model][$field])) {
@@ -108,7 +108,7 @@
     $fieldName = 'data[' . $model . '][' . $field . ']';
     $content .= '<label for="' . $field . '">' . $title . ($required ? ' <span class="required">*</span>' : '') . '</label>';
     $content .= '<select ' . ($required ? 'required="required" ' : '') . 'name="' . $fieldName . '"' . $defaultSelected . ' id="' . $field . '" class="' . $class . '">';
-    $content .= '<option value="">' . $placeholderText . '</option>';
+    $content .= '<option value="">' . $placeholder . '</option>';
     foreach($options as $k => $v) {
       $content .= sprintf('<option %s value="%s">%s</option>',
           (isset($data[$model][$field]) && $data[$model][$field] == $k ? ' selected="selected"' : ''),

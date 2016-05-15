@@ -25,31 +25,32 @@
 
   // vendor directory
   // example: E:\wamp\www\my-piss-app\vendor\ (with trailing slash)
-  if(!defined('VENDOR_DIR')) define('VENDOR_DIR', ROOT . 'elements' . DS);
+  if(!defined('VENDOR_DIR')) define('VENDOR_DIR', ROOT . 'vendor' . DS);
 
   // controllers directory
-  // example: E:\wamp\www\my-piss-app\controller\
+  // example: E:\wamp\www\my-piss-app\app\controller\
   if(!defined('CONTROLLER_DIR')) define('CONTROLLER_DIR', APP_ROOT . DS . 'controller' . DS);
 
   // models directory
-  // example: E:\wamp\www\my-piss-app\model\
+  // example: E:\wamp\www\my-piss-app\app\model\
   if(!defined('MODEL_DIR')) define('MODEL_DIR', APP_ROOT . DS . 'model' . DS);
 
   // views directory
-  // example: E:\wamp\www\my-piss-app\conf\
+  // example: E:\wamp\www\my-piss-app\app\conf\
   if(!defined('VIEW_DIR')) define('VIEW_DIR', APP_ROOT . DS . 'view' . DS);
 
   // template directory
-  // example: E:\wamp\www\my-piss-app\template\
+  // example: E:\wamp\www\my-piss-app\app\view\template\
   if(!defined('TEMPLATE_DIR')) define('TEMPLATE_DIR', VIEW_DIR . 'template' . DS);
 
   // element directory
-  // example: E:\wamp\www\my-piss-app\elements\
+  // example: E:\wamp\www\my-piss-app\app\view\elements\
   if(!defined('ELEMENT_DIR')) define('ELEMENT_DIR', VIEW_DIR . 'elements' . DS);
 
   // get core and database config
   require_once(PISS_ROOT . DS . 'config.php');
   require_once(APP_ROOT . DS . 'conf' . DS . 'app-config.php');
+  require_once(APP_ROOT . DS . 'conf' . DS . 'env-config.php');
   require_once(APP_ROOT . DS . 'conf' . DS . 'db-config.php');
   require_once(PISS_ROOT . DS . 'db-select.php');
   require_once(PISS_ROOT . DS . 'helpers.php');
@@ -57,3 +58,4 @@
   require_once(PISS_ROOT . DS . 'app.php');
   require_once(PISS_ROOT . DS . 'model.php');
   require_once(PISS_ROOT . DS . 'controller.php');
+  require_once(CONTROLLER_DIR . 'app-controller.php');

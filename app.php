@@ -32,22 +32,22 @@ class App
 
       // Put URL parts into according properties
       // note the first one is always /root because the mod-rewrite sends us there
-      $this->urlController =  (isset($url[0]) ? $url[0] : null);
-      $this->urlAction =      (isset($url[1]) ? $url[1] : null);
-      $this->urlParameter1 =  (isset($url[2]) ? $url[2] : null);
-      $this->urlParameter2 =  (isset($url[3]) ? $url[3] : null);
-      $this->urlParameter3 =  (isset($url[4]) ? $url[4] : null);
-      $this->urlParameter4 =  (isset($url[5]) ? $url[5] : null);
-      $this->urlParameter5 =  (isset($url[6]) ? $url[6] : null);
-      $this->urlParameter6 =  (isset($url[7]) ? $url[7] : null);
+      $this->urlController =  (isset($url[0]) ? strtolower($url[0]) : null);
+      $this->urlAction =      (isset($url[1]) ? strtolower($url[1]) : null);
+      $this->urlParameter1 =  (isset($url[2]) ? strtolower($url[2]) : null);
+      $this->urlParameter2 =  (isset($url[3]) ? strtolower($url[3]) : null);
+      $this->urlParameter3 =  (isset($url[4]) ? strtolower($url[4]) : null);
+      $this->urlParameter4 =  (isset($url[5]) ? strtolower($url[5]) : null);
+      $this->urlParameter5 =  (isset($url[6]) ? strtolower($url[6]) : null);
+      $this->urlParameter6 =  (isset($url[7]) ? strtolower($url[7]) : null);
     }
 
     // check for controller: does such a controller exist ?
-    // Also make sure we are not trying to load / (index) bnecause this will try and load the
+    // Also make sure we are not trying to load / (index) because this will try and load the
     // plain controller.php and shit will die
-    if(file_exists(CONTROLLER_DIR . str_replace('-', '', $this->urlController) . 'controller.php') && $this->urlController != '') {
+    if(file_exists(CONTROLLER_DIR . $this->urlController . '-controller.php') && $this->urlController != '') {
       // get the controller file
-      require_once(CONTROLLER_DIR . str_replace('-', '', $this->urlController) . 'controller.php');
+      require_once(CONTROLLER_DIR . $this->urlController . '-controller.php');
       // create controller name by converting underscored words to camelcase
       $controllerName = str_replace(' ', '', ucwords(str_replace('-', ' ', $this->urlController))) . 'Controller';
       $this->urlController = new $controllerName();
@@ -96,7 +96,7 @@ class App
           // make sure it exists, render it
           header('HTTP/1.0 404 Not Found');
           // get the controller file
-          require_once(CONTROLLER_DIR . 'infocontroller.php');
+          require_once(CONTROLLER_DIR . 'info-controller.php');
           $infoController = new InfoController();
           debug('<h2>Missing controller method</h2><p>The method <strong>' . $action . '()</strong> does not exist. Create method inside ' . $controllerName . ' and make sure it has a view file.</p>');
           $infoController->error();
@@ -107,12 +107,12 @@ class App
     } else {
       if(!isset($url)) {
         // invalid URL, so simply show home/index
-        require_once(CONTROLLER_DIR . 'homecontroller.php');
+        require_once(CONTROLLER_DIR . 'home-controller.php');
         $home = new HomeController();
         $home->index();
       } else {
         header('HTTP/1.0 404 Not Found');
-        require_once(CONTROLLER_DIR . 'infocontroller.php');
+        require_once(CONTROLLER_DIR . 'info-controller.php');
         $con = new InfoController();
         $con->error();
       }

@@ -85,18 +85,18 @@
 	function ha($data, $value) {
 		$result = '<em class="bad">Not Found</em>';
 		if(isset($data[$value])) $result = $data[$value];
-		echo $result;
+		return $result;
 	}
 
 	// outputs html yes no
   // can swap in 2nd parameter
 	function hyn($oneOrZero, $swapGoodBad = false) {
-		echo ($oneOrZero == 1 ? '<span class="' . ($swapGoodBad ? 'bad' : 'good') . '">Yes</span>' : '<span class="' . ($swapGoodBad ? 'good' : 'bad') . '">No</span>');
+		return ($oneOrZero == 1 ? '<span class="' . ($swapGoodBad ? 'bad' : 'good') . '">Yes</span>' : '<span class="' . ($swapGoodBad ? 'good' : 'bad') . '">No</span>');
 	}
 
 	// outputs plain text yes no
 	function yn($oneOrZero) {
-		echo ($oneOrZero == 1 ? 'Yes' : 'No');
+		return ($oneOrZero == 1 ? 'Yes' : 'No');
 	}
 
 	// records a message in a stack ready to print to the 
@@ -105,22 +105,19 @@
 		//
 		//slog('Message log: ' . $message);
 		Session::insert('Messages', array('message' => $message, 'class' => $class));
-	}	
-
-	// records a debug in a stack ready to print to the 
-	// view on the next view load
-	function bug($data, $title = 'Debug') {
-		ob_start();
-		var_dump($data);
-		$dumpData = ob_get_clean();
-		$message = $title . ' ' . $dumpData;
-		Session::insert('DebugData', array('message' => $message));
 	}
 
 	// records a debug in a stack ready to print to the
 	// view on the next view load
-	function debug($data, $title = 'Debug') {
-		$message = $title . ' ' . print_r($data, true);
+	function debug($data, $title = 'Debug', $varDump = false) {
+    if($varDump) {
+      ob_start();
+      var_dump($data);
+      $dumpData = ob_get_clean();
+      $message = $title . ' ' . $dumpData;
+    } else {
+      $message = $title . ' ' . print_r($data, true);
+    }
 		Session::insert('DebugData', array('message' => $message));
 	}
 
@@ -189,7 +186,8 @@
 	// "File load Error"
 	function flerror($filePath, $errorTitle = 'Missing core file', $description = null) {
 		if($description == null) $description = $filePath;
-		echo '<h2>' . $errorTitle . '</h2><p>' . $description . '</p>
+		echo '<h2>' . $errorTitle . '</h2>
+		  <p>' . $description . '</p>
 			<p>' . $filePath . '</p>';
 	}
 
@@ -211,11 +209,10 @@
 		}
 	}
 	
-	// redirects to a distination
+	// redirects to a destination
 	function redirect($destination) {
 		// where to go after song has been added
     header('location: ' . Config::read('Website.home') . $destination);
-   // pr($_SESSION);
     die();
 	}
 	
@@ -229,17 +226,24 @@
 	function title($name) {
 		Session::write('PageTitle', $name);
 	}
+
+  // adds an extra title to the page
+	function description($description) {
+		Session::write('PageDescription', $description);
+	}
 	
 	// echos queued page scripts and then removes them from queue
 	function pageScripts() {
 		$scripts = Session::read('Scripts');
+    $scriptString = '';
 		if(!empty($scripts)) {
 			foreach($scripts as $script) {
-				echo sprintf('<script src="%s/js/%s.js"></script>', Config::read('Website.home'), $script['name']);
+        $scriptString .= sprintf('<script src="%s/js/%s.js"></script>', Config::read('Website.home'), $script['name']);
 			}
 			// clear messages from message thing
 			Session::delete('Scripts');
 		}
+    return $scriptString;
 	}
 	
 	//
@@ -250,27 +254,68 @@
 		} else {
 			$pageTitle = Config::read('Website.name') . ' - ' . Config::read('Website.slogan');
 		}
-		echo $pageTitle;
 		// clear messages from message thing
 		Session::delete('PageTitle');
+		return $pageTitle;
+	}
+
+	//
+	function pageDescription() {
+		$pageDescription = Session::read('PageDescription');
+		if(!$pageDescription) {
+      $pageDescription = Config::read('Website.description');
+		}
+		// clear messages from message thing
+		Session::delete('PageDescription');
+		return $pageDescription;
+	}
+
+  // echo's the site's URL home page
+  function homeUrl() {
+    return Config::read('Website.home');
+  }
+
+  // returns a slug version of a string
+  // eg: This Sucks -> this-sucks
+  function slugify($string)	{
+  		$slug = preg_replace('/[^A-Za-z0-9-]+/', '-', $string);
+  		$slug = strtolower($slug);
+  		return $slug;
+	}
+
+  // creates a string for logging client's IP addresses
+	function ipGather() {
+		$forwardedFor = '(none)';
+		$ip = '(unknown)';
+		// 111.111.111.111:11111
+    if(isset($_SERVER['HTTP_X_FORWARDED_FOR'])) $forwardedFor = $_SERVER['HTTP_X_FORWARDED_FOR'];
+		if(isset($_SERVER['REMOTE_ADDR'])) $ip = $_SERVER['REMOTE_ADDR'];
+		return 'IP: ' . $ip . ' | forwarded for: ' . $forwardedFor . '.';
 	}
 
   // renders a component
-  function component($file, $componentData = false) {
-    include(COMPONENT_DIR . $file . '.php');
+  // because this is an include, we can use
+  // $componentData in the included file
+  function element($file, $componentData = false) {
+    $filePath = ELEMENT_DIR . $file . '.php';
+    $description = $file;
+    if(file_exists($filePath)) {
+      require_once($filePath);
+      return true;
+    } else {
+      flerror($filePath, 'Element not found', $description);
+      return false;
+    }
   }
 
 	// draws page messages stored in session
 	function pageMessages() {
 		// get messages, or false if none
 		$messages = Session::read('Messages');
-		
 		// if there's messages, load component for messages
-		if($messages)
-		{
+		if($messages) {
       // load component
-      component('messages', $messages);
-
+      element('messages', $messages);
 			// clear messages from message thing
 			Session::delete('Messages');
 		}
@@ -284,7 +329,7 @@
 			// if there's messages, create div tag and print them
 			if($messages) {
 				// load component
-				component('debugs', $messages);
+        element('debugs', $messages);
 				// clear messages from message thing
 				Session::delete('DebugData');
 			}
@@ -293,7 +338,7 @@
 			// if there's messages, create div tag and print them
 			if($messages) {
 				// load component
-				component('debugs', $messages);
+        element('debugs', $messages);
 				// clear messages from message thing
 				Session::delete('BugData');
 			}
@@ -342,7 +387,7 @@
 			"MIME-Version: 1.0\r\n" . 
 			"Content-Type: text/html; charset=ISO-8859-1\r\n";
 		$message = sprintf('<table width="100%%" border="0" cellspacing="0" cellpadding="0"><tr><td align="left">%s</td></tr><tr><td style="color:white;">(%s end of message.)</td></tr></table>', $message, date('Y-m-d H:i:s'));
-    // TODO: turn off erorrs and reebale to supress warnings
+    // TODO: turn off errors and readable to suppress warnings
     /*
       $errLevel = error_reporting(E_ALL ^ E_NOTICE);  // suppress NOTICEs
       mail(...);
@@ -350,9 +395,4 @@
      */
     $mailResult = mail($to, $subject, $message, $headers);
 		return $mailResult;
-	}
-
-	// echo's the site's URL home page
-	function homeUrl() {
-    echo Config::read('Website.home');
 	}

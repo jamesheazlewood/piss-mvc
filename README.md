@@ -29,7 +29,7 @@ All PHP vendor scripts and libs should be placed in the /yoursite/vendors/ folde
 
 Usage coming soon.
 
-Basic usage is MVC style. You create model files like app/model/users.php and controllers like app/controller/userscontroller.php and views like app/views/users/something.php
+Basic usage is MVC style. You create model files like app/model/user.php and controllers like app/controller/userscontroller.php and views like app/views/users/something.php
 
 Refer to the code to see how it works.
 
