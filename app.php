@@ -98,7 +98,11 @@ class App
           // get the controller file
           require_once(CONTROLLER_DIR . 'info-controller.php');
           $infoController = new InfoController();
-          debug('<h2>Missing controller method</h2><p>The method <strong>' . $action . '()</strong> does not exist. Create method inside ' . $controllerName . ' and make sure it has a view file.</p>');
+          debug('<h2>Missing controller method</h2><p>The method <strong>'
+            . $action
+            . '()</strong> does not exist. Create method inside '
+            . $controllerName
+            . ' and make sure it has a view file.</p>');
           $infoController->error();
         } else {
           $this->urlController->index();

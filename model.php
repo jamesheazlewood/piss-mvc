@@ -5,8 +5,7 @@ class Model {
 	function __construct($db) {
     try {
       $this->db = $db;
-    }
-	catch(PDOException $e) {
+    } catch(PDOException $e) {
       exit('Database connection could not be established.');
     }
   }
@@ -14,6 +13,7 @@ class Model {
   public function findAll() {
     return array();
   }
+
   public function findById($id) {
     return array();
   }
@@ -86,9 +86,6 @@ class Model {
     }
     $executeData[':id'] = $id;
 
-    //pr($sql);
-    //pr($executeData);
-
     // prepare
     $statement = $this->db->prepare($sql);
     $error = false;
@@ -140,7 +137,7 @@ class Model {
           if(!is_numeric($data[$k])) $data['_ValidationErrors'][$k] = $v['number'];
           if(!is_numeric($data[$k])) $data['_ValidationErrors'][$k] = ($v['number'] === true ? 'Enter a valid number.' : $v['number']);
         }
-         // password (must have 'password' in data
+        // password (must have 'password' in data
         if(isset($v['confirm_password'])) {
           if(!isset($data['password']) || $data[$k] != $data['password']) $data['_ValidationErrors'][$k] = $v['confirm_password'];
           if(!isset($data['password']) || $data[$k] != $data['password']) {
