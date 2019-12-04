@@ -96,29 +96,30 @@ class App
           // make sure it exists, render it
           header('HTTP/1.0 404 Not Found');
           // get the controller file
-          require_once(CONTROLLER_DIR . 'info-controller.php');
-          $infoController = new InfoController();
+          require_once(CONTROLLER_DIR . 'root-controller.php');
+          $rootController = new RootController();
           debug('<h2>Missing controller method</h2><p>The method <strong>'
             . $action
             . '()</strong> does not exist. Create method inside '
             . $controllerName
             . ' and make sure it has a view file.</p>');
-          $infoController->error();
+          $rootController->status404();
         } else {
           $this->urlController->index();
         }
       }
     } else {
       if(!isset($url)) {
-        // invalid URL, so simply show home/index
-        require_once(CONTROLLER_DIR . 'home-controller.php');
-        $home = new HomeController();
-        $home->index();
+        // invalid URL, so simply show root/index
+        require_once(CONTROLLER_DIR . 'root-controller.php');
+        $rootController = new RootController();
+        $rootController->index();
       } else {
         header('HTTP/1.0 404 Not Found');
-        require_once(CONTROLLER_DIR . 'info-controller.php');
-        $con = new InfoController();
-        $con->error();
+        // invalid URL, so simply show root/index
+        require_once(CONTROLLER_DIR . 'root-controller.php');
+        $rootController = new RootController();
+        $rootController->status404();
       }
     }
 

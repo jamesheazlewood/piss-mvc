@@ -1,4 +1,5 @@
-	<script src="/js/script.js"></script>
+	<?php pageDebugMessages(); ?>
+	<script src="<?= homeURL(); ?>/js/script.js"></script>
 	<?php pageScripts(); ?>
 </body>
 </html>

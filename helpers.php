@@ -300,14 +300,14 @@ function ipGather() {
 // renders a component
 // because this is an include, we can use
 // $componentData in the included file
-function element($file, $componentData = false) {
-  $filePath = ELEMENT_DIR . $file . '.php';
+function component($file, $componentData = false) {
+  $filePath = COMPONENT_DIR . $file . '.php';
   $description = $file;
   if(file_exists($filePath)) {
     require_once($filePath);
     return true;
   } else {
-    flerror($filePath, 'Element not found', $description);
+    flerror($filePath, 'Component not found', $description);
     return false;
   }
 }
@@ -319,7 +319,7 @@ function pageMessages() {
   // if there's messages, load component for messages
   if($messages) {
     // load component
-    element('messages', $messages);
+    component('messages', $messages);
     // clear messages from message thing
     Session::delete('Messages');
   }
@@ -333,7 +333,7 @@ function pageDebugMessages() {
     // if there's messages, create div tag and print them
     if($messages) {
       // load component
-      element('debugs', $messages);
+      component('debugs', $messages);
       // clear messages from message thing
       Session::delete('DebugData');
     }
@@ -342,7 +342,7 @@ function pageDebugMessages() {
     // if there's messages, create div tag and print them
     if($messages) {
       // load component
-      element('debugs', $messages);
+      component('debugs', $messages);
       // clear messages from message thing
       Session::delete('BugData');
     }

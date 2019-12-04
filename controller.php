@@ -15,14 +15,21 @@ class Controller {
 	/**
 	 * @var array site options
 	 */
-	public $siteOptions = array();
+  public $siteOptions = array();
+
+	/**
+	 * @var array Info about template trying to render
+	 */
+	public $renderInfo = array();
 
 	/**
 	 * Whenever a controller is created, open a database connection too. The idea behind is to have ONE connection
 	 * that can be used by multiple models (there are frameworks that open one connection per model).
 	 */
 	function __construct() {
-			$this->openDatabaseConnection();
+    if(Config::read('DB.use')) {
+      $this->openDatabaseConnection();
+    }
 	}
 
 	/**
@@ -50,39 +57,60 @@ class Controller {
 	// name is converted to lowercase and is then used as the filename
 	// return : NEW model object, or false if not found
 	public function loadModel($modelName) {
-		// return true or false if it loaded or not
-		return rowe(MODEL_DIR . strtolower($modelName) . '.php');
+    // 
+    // require_once(MODEL_DIR . strtolower($modelName) . '.php');
+    // return true or false if it loaded or not
+		$found = rowe(MODEL_DIR . strtolower($modelName) . '.php');
 		// return new model (and pass the database connection to the model)
-		//return ($found ? $modelName($this->db) : false);
+		return ($found ? new $modelName($this->db) : null);
 	}
 	
 	// basically just renders the template and view
 	public function render($model, $viewFile = 'index', $templateFile = 'default') {
 		$headerPath = TEMPLATE_DIR . $templateFile . DS . 'header.php';
 		$viewPath = VIEW_DIR . $model . DS . $viewFile . '.php';
-		$footerPath = TEMPLATE_DIR . $templateFile . DS . 'footer.php';
+    $footerPath = TEMPLATE_DIR . $templateFile . DS . 'footer.php';
+    $this->renderInfo = array(
+      'model' => $model,
+      'viewFile' => $viewFile,
+      'templateFile' => $templateFile,
+      'headerPath' => $templateFile,
+      'viewPath' => $templateFile,
+      'footerPath' => $templateFile
+    );
 		if(file_exists($headerPath)) {
 			require_once($headerPath);
 		} else {
-			flerror($headerPath, 'Missing template header file', 'The header file for <strong>' . $templateFile . '</strong> does not exist.');
+			flerror(
+        $headerPath,
+        'Missing template header file',
+        'The header file for <strong>' . $templateFile . '</strong> does not exist.'
+      );
 		}
 		if(file_exists($viewPath)) {
 			require_once($viewPath);
 		} else {
-			flerror($viewPath, 'Missing view', 'The view file for <strong>' . $model . ' / ' . $viewFile . '</strong> does not exist.');
+			flerror(
+        $viewPath,
+        'Missing view',
+        'The view file for <strong>' . $model . ' / ' . $viewFile . '</strong> does not exist.'
+      );
 		}
 		if(file_exists($footerPath)) {
 			require_once($footerPath);
 		} else {
-			flerror($footerPath, 'Missing template footer file', 'The footer file for <strong>' . $templateFile . '</strong> does not exist.');
+      flerror(
+        $footerPath,
+        'Missing template footer file',
+        'The footer file for <strong>' . $templateFile . '</strong> does not exist.'
+      );
 		}
 	}
 	
 	// Simple json renderer
 	public function jsonRender($array) {
-		$result = json_encode($array);
 		header('Content-Type: application/json');
-		echo $result;
+		echo json_encode($array);
     die();
 	}
 }

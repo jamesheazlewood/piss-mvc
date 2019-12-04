@@ -10,15 +10,7 @@ class Model {
     }
   }
 
-  public function findAll() {
-    return array();
-  }
-
-  public function findById($id) {
-    return array();
-  }
-
-  // saves new mentor to database
+  // Inserts to database
   public function insert($data, $tableName) {
     // build statement out of data key values.
     // make sure they are correct programmer minion
@@ -54,7 +46,10 @@ class Model {
     }
 
     // return ID of newly created entry
-    if(!$error) return $this->db->lastInsertId();
+    if(!$error) {
+      return $this->db->lastInsertId();
+    }
+    
     return 0;
   }
 
@@ -66,7 +61,9 @@ class Model {
 
     // if at this stage, after ID is gone,
     // we have no data, go away
-    if(empty($data)) return true;
+    if(empty($data)) {
+      return true;
+    }
 
     // build statement out of data key values.
     // make sure they are correct programmer minion
@@ -97,7 +94,10 @@ class Model {
     }
 
     // return ID of newly created entry
-    if($error) return false;
+    if($error) {
+      return false;
+    }
+
     return true;
   }
 

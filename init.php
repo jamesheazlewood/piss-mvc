@@ -43,9 +43,9 @@
   // example: E:\wamp\www\my-piss-app\app\view\template\
   if(!defined('TEMPLATE_DIR')) define('TEMPLATE_DIR', VIEW_DIR . 'template' . DS);
 
-  // element directory
-  // example: E:\wamp\www\my-piss-app\app\view\elements\
-  if(!defined('ELEMENT_DIR')) define('ELEMENT_DIR', VIEW_DIR . 'elements' . DS);
+  // Components directory
+  // example: E:\wamp\www\my-piss-app\app\view\components\
+  if(!defined('COMPONENT_DIR')) define('COMPONENT_DIR', VIEW_DIR . 'components' . DS);
 
   // get core and database config
   require_once(PISS_ROOT . DS . 'config.php');
@@ -57,5 +57,6 @@
   require_once(PISS_ROOT . DS . 'forms.php');
   require_once(PISS_ROOT . DS . 'app.php');
   require_once(PISS_ROOT . DS . 'model.php');
+  require_once(PISS_ROOT . DS . 'json-model.php');
   require_once(PISS_ROOT . DS . 'controller.php');
   require_once(CONTROLLER_DIR . 'app-controller.php');

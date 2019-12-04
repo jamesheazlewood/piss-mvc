@@ -1,23 +1,17 @@
 <?php
 
 // controller for home pages
-class HomeController extends Controller
-{
-    // index method
+class RootController extends Controller {
+  // index method
 	// this should be the actual home page
-    public function index()	{
+  public function index()	{
 		//
 		$reviewModel = $this->loadModel('Review');
 		$this->data['Review'] = $reviewModel->findLatest();
 
 		// load views. within the views we can echo out stuff
-		$this->render('home', 'index');
-    }
-
-	//
-	public function video()	{
-		$this->render('home', 'video');
-	}
+		$this->render('root', 'index');
+  }
 
 	//
 	public function watched()	{
@@ -28,11 +22,11 @@ class HomeController extends Controller
 	//
 	public function terms()	{
 		$this->data['ShowVideo'] = false;
-		$this->render('home', 'terms');
+		$this->render('root', 'terms');
 	}
 
 	//
-	public function error()	{
-		$this->render('home', 'error');
+	public function status404()	{
+		$this->render('root', 'status404');
 	}
 }
