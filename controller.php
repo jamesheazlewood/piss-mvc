@@ -10,65 +10,65 @@ class Controller {
   /**
    * @var array POST data ready for form fields
    */
-	public $data = array();
+  public $data = array();
 
-	/**
-	 * @var array site options
-	 */
+  /**
+   * @var array site options
+   */
   public $siteOptions = array();
 
-	/**
-	 * @var array Info about template trying to render
-	 */
-	public $renderInfo = array();
+  /**
+   * @var array Info about template trying to render
+   */
+  public $renderInfo = array();
 
-	/**
-	 * Whenever a controller is created, open a database connection too. The idea behind is to have ONE connection
-	 * that can be used by multiple models (there are frameworks that open one connection per model).
-	 */
-	function __construct() {
+  /**
+   * Whenever a controller is created, open a database connection too. The idea behind is to have ONE connection
+   * that can be used by multiple models (there are frameworks that open one connection per model).
+   */
+  function __construct() {
     if(Config::read('DB.use')) {
       $this->openDatabaseConnection();
     }
-	}
+  }
 
-	/**
-	 * Open the database connection with the credentials from application/config/config.php
-	 */
-	private function openDatabaseConnection() {
-		// set the (optional) options of the PDO connection. in this case, we set the fetch mode to
-		// "objects", which means all results will be objects, like this: $result->user_name !
-		// For example, fetch mode FETCH_ASSOC would return results like this: $result["user_name] !
-		// @see http://www.php.net/manual/en/pdostatement.fetch.php
+  /**
+   * Open the database connection with the credentials from application/config/config.php
+   */
+  private function openDatabaseConnection() {
+    // set the (optional) options of the PDO connection. in this case, we set the fetch mode to
+    // "objects", which means all results will be objects, like this: $result->user_name !
+    // For example, fetch mode FETCH_ASSOC would return results like this: $result["user_name] !
+    // @see http://www.php.net/manual/en/pdostatement.fetch.php
     $options = array(PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
       PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION);
 
-		// generate a database connection, using the PDO connector
-		// @see http://net.tutsplus.com/tutorials/php/why-you-should-be-using-phps-pdo-for-database-access/
-		$this->db = new PDO(
-			'mysql:host=' . Config::read('DB.host') . ';dbname=' . Config::read('DB.database'),
-			Config::read('DB.username'),
-			Config::read('DB.password'),
-			$options
-		);
-	}
+    // generate a database connection, using the PDO connector
+    // @see http://net.tutsplus.com/tutorials/php/why-you-should-be-using-phps-pdo-for-database-access/
+    $this->db = new PDO(
+      'mysql:host=' . Config::read('DB.host') . ';dbname=' . Config::read('DB.database'),
+      Config::read('DB.username'),
+      Config::read('DB.password'),
+      $options
+    );
+  }
 
-	// return model from model name
-	// name is converted to lowercase and is then used as the filename
-	// return : NEW model object, or false if not found
-	public function loadModel($modelName) {
+  // return model from model name
+  // name is converted to lowercase and is then used as the filename
+  // return : NEW model object, or false if not found
+  public function loadModel($modelName) {
     // 
     // require_once(MODEL_DIR . strtolower($modelName) . '.php');
     // return true or false if it loaded or not
-		$found = rowe(MODEL_DIR . strtolower($modelName) . '.php');
-		// return new model (and pass the database connection to the model)
-		return ($found ? new $modelName($this->db) : null);
-	}
-	
-	// basically just renders the template and view
-	public function render($model, $viewFile = 'index', $templateFile = 'default') {
-		$headerPath = TEMPLATE_DIR . $templateFile . DS . 'header.php';
-		$viewPath = VIEW_DIR . $model . DS . $viewFile . '.php';
+    $found = rowe(MODEL_DIR . strtolower($modelName) . '.php');
+    // return new model (and pass the database connection to the model)
+    return ($found ? new $modelName($this->db) : null);
+  }
+  
+  // basically just renders the template and view
+  public function render($model, $viewFile = 'index', $templateFile = 'default') {
+    $headerPath = TEMPLATE_DIR . $templateFile . DS . 'header.php';
+    $viewPath = VIEW_DIR . $model . DS . $viewFile . '.php';
     $footerPath = TEMPLATE_DIR . $templateFile . DS . 'footer.php';
     $this->renderInfo = array(
       'model' => $model,
@@ -78,39 +78,54 @@ class Controller {
       'viewPath' => $templateFile,
       'footerPath' => $templateFile
     );
-		if(file_exists($headerPath)) {
-			require_once($headerPath);
-		} else {
-			flerror(
+
+    if(file_exists($headerPath)) {
+      require_once($headerPath);
+    } else {
+      flerror(
         $headerPath,
         'Missing template header file',
         'The header file for <strong>' . $templateFile . '</strong> does not exist.'
       );
-		}
-		if(file_exists($viewPath)) {
-			require_once($viewPath);
-		} else {
-			flerror(
+    }
+
+    if(file_exists($viewPath)) {
+      require_once($viewPath);
+    } else {
+      flerror(
         $viewPath,
         'Missing view',
         'The view file for <strong>' . $model . ' / ' . $viewFile . '</strong> does not exist.'
       );
-		}
-		if(file_exists($footerPath)) {
-			require_once($footerPath);
-		} else {
+    }
+
+    if(file_exists($footerPath)) {
+      require_once($footerPath);
+    } else {
       flerror(
         $footerPath,
         'Missing template footer file',
         'The footer file for <strong>' . $templateFile . '</strong> does not exist.'
       );
-		}
-	}
-	
-	// Simple json renderer
-	public function jsonRender($array) {
-		header('Content-Type: application/json');
-		echo json_encode($array);
+    }
+  }
+  
+  // Simple json renderer
+  public function jsonRender($array) {
+    header('Content-Type: application/json');
+    echo json_encode($array);
     die();
-	}
+  }
+
+  public function templateInfo() {
+    if($_SERVER['REQUEST_URI'] === '/') {
+      return 'Home page';
+    }
+    return sprintf(
+      '%s/%s [%s]',
+      $this->renderInfo['model'], 
+      $this->renderInfo['viewFile'],
+      $this->renderInfo['templateFile']
+    );
+  }
 }

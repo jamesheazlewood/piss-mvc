@@ -8,7 +8,7 @@ class Session {
     // start session
     session_cache_limiter();
     session_start();
-  }	
+  }  
   
   // adds value to the session
   public static function write($key, $value) {
@@ -34,14 +34,14 @@ class Session {
   // returns the entire variable
   public static function readAll() {
     return $_SESSION;
-  }		
+  }    
   
   // close wrtie of session
   public static function close() {
     // stop session
     session_write_close();
-  }	
-}	
+  }  
+}  
 
 // this basically spits out an array in "preformatted" tags.
 // eg. : <pre>Array() { blah } </pre>
@@ -123,7 +123,7 @@ function debug($data, $title = 'Debug', $varDump = false) {
 }
 
 // strips slashes and tags from string
-function strip($data)	{
+function strip($data)  {
   return stripslashes(strip_tags($data));
 }
 
@@ -141,18 +141,18 @@ function niceDate($sqlDateTime) {
 }
 
 // returns a nice date and time
-function niceDateTime($sqlDateTime)	{
+function niceDateTime($sqlDateTime)  {
   return date(Config::read('Nice.datetime'), strtotime($sqlDateTime));
 }
 
 // returns a nice date and time
-function niceTime($sqlDateTime)	{
+function niceTime($sqlDateTime)  {
   return date(Config::read('Nice.time'), strtotime($sqlDateTime));
 }
 
 // logs to the log file in the "logs" dir
 // short for "site Log"
-function slog($message)	{
+function slog($message)  {
   // set up strings for log files and dirs
   $logDir = $file = APP_ROOT . DS . 'logs' . DS;
   $logFile = $logDir . 'sitelog-' . date('Y-m-d') . '.log';
@@ -281,10 +281,23 @@ function homeUrl() {
 
 // returns a slug version of a string
 // eg: This Sucks -> this-sucks
-function slugify($string)	{
+function slugify($string)  {
   $slug = preg_replace('/[^A-Za-z0-9-]+/', '-', $string);
   $slug = strtolower($slug);
   return $slug;
+}
+
+// Typical HTML nav
+function nav($links = ['/' => 'Home']) {
+  $out = '<ul>';
+  foreach($links as $k => $v) {
+    $class = $_SERVER['REQUEST_URI'] === $k ? ' class="active"' : '';
+    $out .= '<li><a href="' . $k . '"' . $class . '>'
+      . $v
+      . '</a></li>';
+  }
+  $out .= '</ul>';
+  return $out;
 }
 
 // creates a string for logging client's IP addresses
